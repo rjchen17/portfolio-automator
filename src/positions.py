@@ -4,6 +4,11 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+SCHWAB_COLUMNS = ('"Symbol","Description","Qty (Quantity)","Price","Price Chng $ (Price Change $)","Price Chng % (Price '
+                  'Change %)","Mkt Val (Market Value)","Day Chng $ (Day Change $)","Day Chng % '
+                  '(Day Change %)","Cost Basis","Gain $ (Gain/Loss $)","Gain % (Gain/Loss %)","Reinvest?",'
+                  '"Reinvest Capital Gains?","Security Type",')
+
 
 @dataclass
 class Position:
@@ -27,7 +32,7 @@ class Position:
     name: str | None = None
 
 
-class PositionTable:
+class PositionsTable:
     """
     The full table of positions held by an investor.
     """
@@ -47,3 +52,17 @@ class PositionTable:
         if not os.path.exists(path):
             raise FileNotFoundError(f"File not found at path: {path}. ")
 
+        with open(path, 'r') as positions_table:
+
+            data = positions_table.readlines()
+            data.pop(0)  # Remove account number and data header
+            data.pop(0)  # Remove blank line
+            columns = data.pop(0).strip()  # Remove column names, save for data validation
+
+            if columns != SCHWAB_COLUMNS:
+                print(f"{columns}\n\n\n{SCHWAB_COLUMNS}")
+                raise ValueError("Incorrect column names. Ensure that data has not been modified/corrupted. If data"
+                                 " is correct, code format is out of date and must be patched. ")
+            positions = data
+
+            return cls(positions)
