@@ -10,9 +10,8 @@ SCHWAB_COLUMNS = ('"Symbol","Description","Qty (Quantity)","Price","Price Chng $
                   '"Reinvest Capital Gains?","Security Type",')
 
 
-@dataclass
 class Position:
-    """ A position of a single security.
+    """A position of a single security.
 
     Attributes:
         symbol: The ticker symbol (i.e. abbreviation) for the underlying security.
@@ -24,13 +23,44 @@ class Position:
           securities can only be bought and sold in only integer quantities.
         name: The full name of the security. Only necessary for visualization/printing purposes.
     """
-    symbol: str
-    quantity: float
-    price: float
-    cost_basis: int
-    security_type: str | None = None
-    name: str | None = None
 
+    def __init__(
+        self,
+        symbol: str,
+        quantity: float | str,
+        price: float | str,
+        cost_basis: float | str,
+        security_type: str | None = None,
+        name: str | None = None,
+    ):
+        self.symbol = symbol
+
+        if not isinstance(quantity, float):
+            self.float = float(quantity)
+        else:
+            self.float = float
+
+        if not isinstance(price, float):
+            self.price = Position.from_dollar_amount(price)
+        else:
+            self.price = price
+
+        if not isinstance(cost_basis, float):
+            self.cost_basis = Position.from_dollar_amount(cost_basis)
+        else:
+            self.cost_basis = cost_basis
+
+        self.security_type = security_type
+        self.name = name
+
+    @staticmethod
+    def from_dollar_amount(amount: str) -> float:
+        """Returns a float dollar amount given a string. """
+        try:
+            dollar_amount = float(amount.strip().replace("$", ""))
+        except ValueError:
+            raise ValueError(f"Provided {amount} is not a valid dollar amount")
+        return dollar_amount
 
 class PositionsTable:
     """
@@ -63,6 +93,13 @@ class PositionsTable:
                 print(f"{columns}\n\n\n{SCHWAB_COLUMNS}")
                 raise ValueError("Incorrect column names. Ensure that data has not been modified/corrupted. If data"
                                  " is correct, code format is out of date and must be patched. ")
-            positions = data
+
+            positions = []
+            for position in data:
+                position = position.split(",")
+                position = [info.replace('"', '') for info in position]
+                position = Position(symbol=position[0], name=position[1], quantity=position[2],
+                                    price=position[3], cost_basis=position[10])
+                positions.append(position)
 
             return cls(positions)
