@@ -3,11 +3,7 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-
-SCHWAB_COLUMNS = ('"Symbol","Description","Qty (Quantity)","Price","Price Chng $ (Price Change $)","Price Chng % (Price '
-                  'Change %)","Mkt Val (Market Value)","Day Chng $ (Day Change $)","Day Chng % '
-                  '(Day Change %)","Cost Basis","Gain $ (Gain/Loss $)","Gain % (Gain/Loss %)","Reinvest?",'
-                  '"Reinvest Capital Gains?","Security Type",')
+from constants.configuration import SCHWAB_COLUMNS, SECURITY_TYPES
 
 
 class Position:
@@ -50,7 +46,8 @@ class Position:
         else:
             self.cost_basis = cost_basis
 
-        self.security_type = security_type
+        if security_type not in SECURITY_TYPES:
+            raise ValueError(f"Security type {security_type} must be one of f{SECURITY_TYPES}. ")
         self.name = name
 
     @staticmethod
@@ -61,6 +58,7 @@ class Position:
         except ValueError:
             raise ValueError(f"Provided {amount} is not a valid dollar amount")
         return dollar_amount
+
 
 class PositionsTable:
     """
@@ -90,7 +88,6 @@ class PositionsTable:
             columns = data.pop(0).strip()  # Remove column names, save for data validation
 
             if columns != SCHWAB_COLUMNS:
-                print(f"{columns}\n\n\n{SCHWAB_COLUMNS}")
                 raise ValueError("Incorrect column names. Ensure that data has not been modified/corrupted. If data"
                                  " is correct, code format is out of date and must be patched. ")
 
@@ -103,3 +100,4 @@ class PositionsTable:
                 positions.append(position)
 
             return cls(positions)
+a = PositionsTable.load_from_schwab("../dummy_schwab.csv")
