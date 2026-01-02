@@ -11,7 +11,7 @@ SCHWAB_COLUMNS = ('"Symbol","Description","Qty (Quantity)","Price","Price Chng $
 
 # >>> Position data
 
-SPLITS = ["dom", "intl", "fi"]  # Supported asset allocation "bins"
+SPLITS = ["dom", "intl", "fi", "UNK"]  # Supported asset allocation "bins"
 SECURITY_TYPES = ["eq", "mm", "etf", "mf"]
 
 # <<< Position data
