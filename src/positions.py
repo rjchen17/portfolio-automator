@@ -48,6 +48,10 @@ class Position:
 
         if security_type not in SECURITY_TYPES:
             raise ValueError(f"Security type {security_type} must be one of f{SECURITY_TYPES}. ")
+        else:
+            self.security_type = security_type
+
+        self.quantity = int(quantity)
         self.name = name
 
     @staticmethod
