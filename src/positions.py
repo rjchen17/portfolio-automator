@@ -104,4 +104,5 @@ class PositionsTable:
                 positions.append(position)
 
             return cls(positions)
-a = PositionsTable.load_from_schwab("../dummy_schwab.csv")
+
+#a = PositionsTable.load_from_schwab("../dummy_schwab.csv")
